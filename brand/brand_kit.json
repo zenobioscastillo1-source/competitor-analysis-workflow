@@ -1,0 +1,54 @@
+{
+  "name": "Nerumi",
+  "tagline": "/ intelligent flow",
+  "colors": {
+    "canvas": "#F5F0E8",
+    "paper": "#FAF6F0",
+    "ink": "#0D0D0D",
+    "ink_soft": "#2A2724",
+    "ink_muted": "#6B645B",
+    "ink_faint": "#9A9288",
+    "ink_ghost": "#C9C0B2",
+    "stone": "#DDD8CE",
+    "stone_deep": "#D0C9BC",
+    "jade": "#6B9E8A",
+    "jade_deep": "#3D6E5C",
+    "jade_soft": "#A8C8BC",
+    "jade_ghost": "#D8EBE3",
+    "clay": "#B87A52",
+    "clay_deep": "#8E5A36",
+    "clay_soft": "#DEB899",
+    "clay_ghost": "#F0DFD0",
+    "accent": "#8B1A1A",
+    "accent_deep": "#6E1414",
+    "accent_soft": "#B23A2E"
+  },
+  "radius": { "xs": "3px", "sm": "6px", "md": "10px", "lg": "14px" },
+  "fonts": {
+    "sans": {
+      "family": "General Sans",
+      "stack": "'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      "faces": [
+        { "weight": 300, "style": "normal", "file": "brand-assets/fonts/GeneralSans_Complete/Fonts/WEB/fonts/GeneralSans-Light.woff2" },
+        { "weight": 400, "style": "normal", "file": "brand-assets/fonts/GeneralSans_Complete/Fonts/WEB/fonts/GeneralSans-Regular.woff2" },
+        { "weight": 500, "style": "normal", "file": "brand-assets/fonts/GeneralSans_Complete/Fonts/WEB/fonts/GeneralSans-Medium.woff2" },
+        { "weight": 600, "style": "normal", "file": "brand-assets/fonts/GeneralSans_Complete/Fonts/WEB/fonts/GeneralSans-Semibold.woff2" },
+        { "weight": 700, "style": "normal", "file": "brand-assets/fonts/GeneralSans_Complete/Fonts/WEB/fonts/GeneralSans-Bold.woff2" }
+      ]
+    },
+    "serif": {
+      "family": "Lora",
+      "stack": "'Lora', Georgia, 'Times New Roman', serif",
+      "faces": [
+        { "weight": 400, "style": "normal", "file": "brand-assets/fonts/Lora_Complete/Fonts/WEB/fonts/Lora-Regular.woff2" },
+        { "weight": 400, "style": "italic", "file": "brand-assets/fonts/Lora_Complete/Fonts/WEB/fonts/Lora-Italic.woff2" },
+        { "weight": 600, "style": "normal", "file": "brand-assets/fonts/Lora_Complete/Fonts/WEB/fonts/Lora-SemiBold.woff2" },
+        { "weight": 600, "style": "italic", "file": "brand-assets/fonts/Lora_Complete/Fonts/WEB/fonts/Lora-SemiBoldItalic.woff2" }
+      ]
+    }
+  },
+  "logo": {
+    "mark": "brand-assets/brand-examples/Nerumi_Logo.svg",
+    "mark_recolor_from": "#231f20"
+  }
+}

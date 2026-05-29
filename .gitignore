@@ -1,0 +1,44 @@
+# Secrets & credentials — NEVER commit these
+.env
+.env.*
+!.env.example
+credentials.json
+token.json
+*.key
+*.pem
+# Google OAuth client downloads (default name) + service-account keys
+client_secret*.json
+service-account*.json
+*-sa.json
+
+# Temporary / regenerable files
+.tmp/
+
+# Generated deliverables (regenerable; PDFs/HTML are large binaries)
+reports/
+
+# Monitoring baselines — durable local state, machine-specific snapshots
+monitor/state/
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.bak
+*~
+*.swp

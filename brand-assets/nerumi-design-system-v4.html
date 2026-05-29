@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nerumi — Design System v4</title>
+  <style>
+    /* ═══════════════════════════════════════════
+       FONT FACES
+    ═══════════════════════════════════════════ */
+
+    /* ZT Bros Oskon 90s — Voice B (serif / quiet) */
+    @font-face { font-family: 'ZTBrosOskon90s'; src: url('fonts/ZTBrosOskon90s-ExtraLight.otf') format('opentype'); font-weight: 200; font-style: normal; }
+    @font-face { font-family: 'ZTBrosOskon90s'; src: url('fonts/ZTBrosOskon90s-ExtLtIta.otf') format('opentype'); font-weight: 200; font-style: italic; }
+    @font-face { font-family: 'ZTBrosOskon90s'; src: url('fonts/ZTBrosOskon90s-Light.otf') format('opentype'); font-weight: 300; font-style: normal; }
+    @font-face { font-family: 'ZTBrosOskon90s'; src: url('fonts/ZTBrosOskon90s-LightItalic.otf') format('opentype'); font-weight: 300; font-style: italic; }
+    @font-face { font-family: 'ZTBrosOskon90s'; src: url('fonts/ZTBrosOskon90s-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'ZTBrosOskon90s'; src: url('fonts/ZTBrosOskon90s-Italic.otf') format('opentype'); font-weight: 400; font-style: italic; }
+
+    /* PP Neue Montreal — Voice A (sans / confident) */
+    @font-face { font-family: 'PPNeueMontreal'; src: url('fonts/PPNeueMontreal-Thin.otf') format('opentype'); font-weight: 100; font-style: normal; }
+    @font-face { font-family: 'PPNeueMontreal'; src: url('fonts/PPNeueMontreal-Book.otf') format('opentype'); font-weight: 400; font-style: normal; }
+    @font-face { font-family: 'PPNeueMontreal'; src: url('fonts/PPNeueMontreal-Italic.otf') format('opentype'); font-weight: 400; font-style: italic; }
+    @font-face { font-family: 'PPNeueMontreal'; src: url('fonts/PPNeueMontreal-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+    @font-face { font-family: 'PPNeueMontreal'; src: url('fonts/PPNeueMontreal-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+    @font-face { font-family: 'PPNeueMontreal'; src: url('fonts/PPNeueMontreal-SemiBolditalic.otf') format('opentype'); font-weight: 600; font-style: italic; }
+
+    /* ═══════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      /* Primary surfaces */
+      --bg:        #F5F0E8;
+      --bg-raised: #FAF6F0;
+      --fg:        #0D0D0D;
+      --fg-soft:   #2A2724;
+      --fg-muted:  #6B645B;
+      --fg-faint:  #9A9288;
+      --fg-ghost:  #C9C0B2;
+      --stone:     #DDD8CE;
+      --stone-deep:#D0C9BC;
+      --accent:    #8B1A1A;
+      --accent-deep:#6E1414;
+      --accent-soft:#B23A2E;
+      --rule:      #0D0D0D;
+
+      /* Botanical — Tayabak */
+      --jade:      #6B9E8A;
+      --jade-soft: #A8C8BC;
+      --jade-deep: #3D6E5C;
+      --jade-ghost:#D8EBE3;
+      --clay:      #B87A52;
+      --clay-soft: #DEB899;
+      --clay-deep: #8E5A36;
+      --clay-ghost:#F0DFD0;
+
+      /* Font stacks */
+      --montreal: 'PPNeueMontreal', -apple-system, BlinkMacSystemFont, sans-serif;
+      --serif:    'ZTBrosOskon90s', Georgia, 'Times New Roman', serif;
+
+      /* Radii — v4: rounded rectangles, no pills */
+      --radius-xs:  3px;
+      --radius-sm:  6px;
+      --radius-md:  10px;
+      --radius-lg:  14px;
+
+      /* Transitions */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration: 0.25s;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--montreal);
+      margin: 0;
+    }
+
+    ::selection { background: var(--fg); color: var(--bg); }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════ */
+    .ds-page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    .ds-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--fg);
+      margin-bottom: 72px;
+    }
+
+    .ds-title {
+      font-family: var(--montreal);
+      font-weight: 700;
+      font-size: 42px;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      line-height: 0.9;
+    }
+    .ds-title-italic {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-style: italic;
+      font-size: 20px;
+      letter-spacing: 0.01em;
+      text-transform: none;
+      color: var(--fg-muted);
+      margin-left: 12px;
+    }
+
+    .ds-version {
+      font-family: var(--montreal);
+      font-weight: 100;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+    }
+
+    /* Section */
+    .ds-section {
+      margin-bottom: 88px;
+    }
+    .ds-section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+    .ds-section-title {
+      font-family: var(--montreal);
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    .ds-section-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--stone);
+      font-family: var(--montreal);
+      font-weight: 500;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+    .ds-section-sub {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-style: italic;
+      font-size: 16px;
+      color: var(--fg-muted);
+      margin-top: -28px;
+      margin-bottom: 36px;
+      line-height: 1.5;
+    }
+
+    .ds-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--stone);
+      margin: 12px 0 36px;
+    }
+
+    .ds-sub-label {
+      font-family: var(--montreal);
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 18px;
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════
+       TYPOGRAPHY SECTION
+    ═══════════════════════════════════════════ */
+    .type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+    }
+
+    .type-card {
+      background: var(--bg-raised);
+      border: 1px solid var(--stone);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .type-card-label {
+      font-family: var(--montreal);
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .type-card-name {
+      font-family: var(--montreal);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+
+    .type-card-meta {
+      font-family: var(--montreal);
+      font-weight: 400;
+      font-size: 11px;
+      color: var(--fg-muted);
+      margin-bottom: 28px;
+    }
+
+    .type-specimen {
+      margin-bottom: 28px;
+    }
+
+    .type-specimen-large {
+      font-size: 96px;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      color: var(--fg);
+    }
+
+    .type-specimen-small {
+      font-size: 28px;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: var(--fg-muted);
+      display: inline-block;
+      margin-left: 12px;
+      vertical-align: baseline;
+    }
+
+    .type-weights {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 1px solid var(--stone);
+      padding-top: 20px;
+    }
+
+    .type-weight-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .type-weight-sample {
+      font-size: 16px;
+      line-height: 1.4;
+      color: var(--fg);
+    }
+
+    .type-weight-label {
+      font-family: var(--montreal);
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--fg-faint);
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    /* Dual heading specimen */
+    .type-dual-demo {
+      background: var(--bg-raised);
+      border: 1px solid var(--stone);
+      border-radius: var(--radius-lg);
+      padding: 48px 36px;
+      margin-top: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px 64px;
+    }
+    .dual-demo-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .dual-bold {
+      font-family: var(--montreal);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--fg);
+    }
+    .dual-italic {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--fg-muted);
+      margin-top: 4px;
+      letter-spacing: 0.01em;
+    }
+
+    /* Scale specimen — large serif display */
+    .type-scale-strip {
+      background: var(--bg-raised);
+      border: 1px solid var(--stone);
+      border-radius: var(--radius-lg);
+      padding: 48px 36px;
+      margin-top: 36px;
+      overflow: hidden;
+    }
+    .type-scale-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--stone);
+    }
+    .type-scale-row:last-child { border-bottom: none; }
+    .type-scale-size {
+      font-family: var(--montreal);
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      width: 56px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       COLORS SECTION
+    ═══════════════════════════════════════════ */
+    .color-tier {
+      margin-bottom: 48px;
+    }
+    .color-tier-label {
+      font-family: var(--montreal);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg);
+      margin-bottom: 18px;
+    }
+
+    .color-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .color-chip {
+      width: 140px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--stone);
+      background: var(--bg-raised);
+      transition: transform var(--duration) var(--ease-out), box-shadow var(--duration) ease;
+    }
+    .color-chip:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px -8px rgba(13,13,13,0.12);
+    }
+
+    .color-swatch {
+      width: 100%;
+      height: 72px;
+    }
+
+    .color-info {
+      padding: 10px 12px;
+    }
+    .color-name {
+      font-family: var(--montreal);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--fg);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .color-hex {
+      font-family: var(--montreal);
+      font-weight: 400;
+      font-size: 10px;
+      color: var(--fg-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: block;
+    }
+    .color-token {
+      font-family: var(--montreal);
+      font-weight: 400;
+      font-size: 9px;
+      color: var(--fg-faint);
+      letter-spacing: 0.04em;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Gradient ramp strips */
+    .color-ramp {
+      display: flex;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      height: 48px;
+      border: 1px solid var(--stone);
+      margin-top: 24px;
+    }
+    .color-ramp-step {
+      flex: 1;
+      position: relative;
+    }
+    .color-ramp-step::after {
+      content: attr(data-label);
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--montreal);
+      font-size: 7px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0.7;
+    }
+    .color-ramp-step.light-text::after { color: var(--bg); }
+    .color-ramp-step.dark-text::after { color: var(--fg); }
+
+    /* ═══════════════════════════════════════════
+       BUTTONS SECTION
+       v4: all rounded rectangle, no pills
+    ═══════════════════════════════════════════ */
+    .btn-matrix-label {
+      font-family: var(--montreal);
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .btn-matrix {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .btn-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 24px;
+      border: 1px dashed var(--stone);
+      border-radius: var(--radius-lg);
+    }
+    .btn-col-title {
+      font-family: var(--montreal);
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg-faint);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    /* Base button reset */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--montreal);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition:
+        background var(--duration) var(--ease-out),
+        color var(--duration) var(--ease-out),
+        border-color var(--duration) var(--ease-out),
+        transform 0.15s var(--ease-out),
+        box-shadow var(--duration) ease;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn svg {
+      width: 1em;
+      height: 1em;
+      flex-shrink: 0;
+    }
+
+    /* ── Sizes — all rounded rectangle (--radius-sm / --radius-md) ── */
+    .btn-xs  { font-size: 8px;  padding: 6px 12px;  border-radius: var(--radius-xs); }
+    .btn-sm  { font-size: 9px;  padding: 8px 16px;  border-radius: var(--radius-sm); }
+    .btn-md  { font-size: 10px; padding: 11px 22px; border-radius: var(--radius-sm); }
+    .btn-lg  { font-size: 11px; padding: 14px 28px; border-radius: var(--radius-md); }
+    .btn-xl  { font-size: 12px; padding: 17px 34px; border-radius: var(--radius-md); }
+
+    /* ── Icon-only buttons ── */
+    .btn-icon { padding: 0; aspect-ratio: 1; }
+    .btn-icon.btn-xs  { width: 28px;  border-radius: var(--radius-xs); }
+    .btn-icon.btn-sm  { width: 32px;  border-radius: var(--radius-sm); }
+    .btn-icon.btn-md  { width: 40px;  border-radius: var(--radius-sm); }
+    .btn-icon.btn-lg  { width: 46px;  border-radius: var(--radius-md); }
+    .btn-icon.btn-xl  { width: 52px;  border-radius: var(--radius-md); }
+    .btn-icon svg { width: 14px; height: 14px; }
+
+    /* ── Style: Ink (solid dark) ── */
+    .btn-ink {
+      background: var(--fg);
+      color: var(--bg);
+      border: 1px solid var(--fg);
+    }
+    .btn-ink:hover {
+      background: var(--fg-soft);
+      box-shadow: 0 4px 16px -4px rgba(13,13,13,0.25);
+    }
+
+    /* ── Style: Outline ── */
+    .btn-outline {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--stone-deep);
+    }
+    .btn-outline:hover {
+      border-color: var(--fg);
+      background: rgba(13,13,13,0.03);
+    }
+
+    /* ── Style: Ghost ── */
+    .btn-ghost {
+      background: transparent;
+      color: var(--fg-muted);
+      border: 1px solid transparent;
+    }
+    .btn-ghost:hover {
+      color: var(--fg);
+      background: rgba(13,13,13,0.04);
+    }
+
+    /* ── Style: Jade (botanical primary) ── */
+    .btn-jade {
+      background: var(--jade);
+      color: #fff;
+      border: 1px solid var(--jade);
+    }
+    .btn-jade:hover {
+      background: var(--jade-deep);
+      border-color: var(--jade-deep);
+      box-shadow: 0 4px 16px -4px rgba(61,110,92,0.35);
+    }
+
+    /* ── Style: Jade Outline ── */
+    .btn-jade-outline {
+      background: transparent;
+      color: var(--jade-deep);
+      border: 1px solid var(--jade);
+    }
+    .btn-jade-outline:hover {
+      background: var(--jade-ghost);
+      border-color: var(--jade-deep);
+    }
+
+    /* ── Style: Clay (warm complement) ── */
+    .btn-clay {
+      background: var(--clay);
+      color: #fff;
+      border: 1px solid var(--clay);
+    }
+    .btn-clay:hover {
+      background: var(--clay-deep);
+      border-color: var(--clay-deep);
+      box-shadow: 0 4px 16px -4px rgba(142,90,54,0.35);
+    }
+
+    /* ── Style: Clay Outline ── */
+    .btn-clay-outline {
+      background: transparent;
+      color: var(--clay-deep);
+      border: 1px solid var(--clay);
+    }
+    .btn-clay-outline:hover {
+      background: var(--clay-ghost);
+      border-color: var(--clay-deep);
+    }
+
+    /* ── Style: Crimson (accent) ── */
+    .btn-crimson {
+      background: var(--accent);
+      color: var(--bg);
+      border: 1px solid var(--accent);
+    }
+    .btn-crimson:hover {
+      background: var(--accent-deep);
+      border-color: var(--accent-deep);
+      box-shadow: 0 4px 16px -4px rgba(139,26,26,0.35);
+    }
+
+    /* ── Style: Crimson Outline ── */
+    .btn-crimson-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent-soft);
+    }
+    .btn-crimson-outline:hover {
+      background: rgba(139,26,26,0.06);
+      border-color: var(--accent);
+    }
+
+    /* ── Disabled state (all styles) ── */
+    .btn[disabled],
+    .btn.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    /* ═══════════════════════════════════════════
+       BADGES & CHIPS
+       v4: rounded rectangle (--radius-sm), not pill
+    ═══════════════════════════════════════════ */
+    .badge-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--montreal);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+    .badge svg { width: 10px; height: 10px; flex-shrink: 0; }
+
+    /* Badge sizes */
+    .badge-sm { font-size: 8px;  padding: 3px 10px; }
+    .badge-md { font-size: 9px;  padding: 4px 12px; }
+    .badge-lg { font-size: 10px; padding: 6px 16px; }
+
+    /* Badge styles */
+    .badge-ink      { background: var(--fg); color: var(--bg); }
+    .badge-outline  { background: transparent; color: var(--fg); border: 1px solid var(--stone-deep); }
+    .badge-jade     { background: var(--jade-ghost); color: var(--jade-deep); border: 1px solid var(--jade-soft); }
+    .badge-jade-solid { background: var(--jade); color: #fff; }
+    .badge-clay     { background: var(--clay-ghost); color: var(--clay-deep); border: 1px solid var(--clay-soft); }
+    .badge-clay-solid { background: var(--clay); color: #fff; }
+    .badge-crimson  { background: rgba(139,26,26,0.08); color: var(--accent); border: 1px solid rgba(139,26,26,0.2); }
+    .badge-crimson-solid { background: var(--accent); color: var(--bg); }
+    .badge-stone    { background: var(--stone); color: var(--fg-muted); }
+
+    /* ═══════════════════════════════════════════
+       SPACING & RADIUS SPECIMENS
+    ═══════════════════════════════════════════ */
+    .radius-row {
+      display: flex;
+      gap: 24px;
+      align-items: flex-end;
+    }
+    .radius-demo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .radius-box {
+      width: 64px;
+      height: 64px;
+      border: 2px solid var(--fg);
+      background: var(--bg-raised);
+    }
+    .radius-label {
+      font-family: var(--montreal);
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+
+    /* ═══════════════════════════════════════════
+       INPUTS
+    ═══════════════════════════════════════════ */
+    .input-row {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .input-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .input-label {
+      font-family: var(--montreal);
+      font-weight: 500;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+    .input-field {
+      font-family: var(--montreal);
+      font-weight: 400;
+      font-size: 13px;
+      color: var(--fg);
+      background: var(--bg-raised);
+      border: 1px solid var(--stone);
+      border-radius: var(--radius-sm);
+      padding: 11px 16px;
+      outline: none;
+      width: 240px;
+      transition: border-color var(--duration) ease, box-shadow var(--duration) ease;
+    }
+    .input-field::placeholder {
+      color: var(--fg-faint);
+    }
+    .input-field:focus {
+      border-color: var(--jade);
+      box-shadow: 0 0 0 3px var(--jade-ghost);
+    }
+    .input-field.input-error {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 3px rgba(139,26,26,0.08);
+    }
+
+    /* ═══════════════════════════════════════════
+       TOGGLE SWITCH
+    ═══════════════════════════════════════════ */
+    .toggle-row {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: var(--stone);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background var(--duration) var(--ease-out);
+      border: none;
+      padding: 0;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      transition: transform var(--duration) var(--ease-out);
+    }
+    .toggle.active {
+      background: var(--jade);
+    }
+    .toggle.active::after {
+      transform: translateX(20px);
+    }
+
+    /* ═══════════════════════════════════════════
+       DARK PREVIEW STRIP
+    ═══════════════════════════════════════════ */
+    .dark-strip {
+      background: var(--fg);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      margin-top: 36px;
+    }
+    .dark-strip .ds-sub-label { color: var(--fg-faint); }
+    .dark-strip .btn-outline {
+      color: var(--bg);
+      border-color: var(--fg-muted);
+    }
+    .dark-strip .btn-outline:hover {
+      border-color: var(--bg);
+      background: rgba(245,240,232,0.08);
+    }
+    .dark-strip .btn-ghost {
+      color: var(--fg-faint);
+    }
+    .dark-strip .btn-ghost:hover {
+      color: var(--bg);
+      background: rgba(245,240,232,0.06);
+    }
+    .dark-strip .badge-outline {
+      color: var(--bg);
+      border-color: var(--fg-muted);
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 960px) {
+      .ds-page { padding: 40px 24px 80px; }
+      .type-grid { grid-template-columns: 1fr; }
+      .btn-matrix { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .btn-matrix { grid-template-columns: 1fr; }
+      .color-row { gap: 8px; }
+      .color-chip { width: 110px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ds-page">
+
+    <!-- ══ HEADER ═════════════════════════════════════════ -->
+    <header class="ds-header">
+      <h1>
+        <span class="ds-title">Nerumi</span>
+        <span class="ds-title-italic">/ design system</span>
+      </h1>
+      <span class="ds-version">Version 4.0 — May 2026</span>
+    </header>
+
+
+    <!-- ══ TYPOGRAPHY ═════════════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Typography</h2>
+        <span class="ds-section-badge">2 Families · 11 Styles</span>
+      </div>
+      <p class="ds-section-sub">Two voices that pair, never compete. Neue Montreal carries structure. ZT Bros Oskon 90s carries soul.</p>
+
+      <div class="type-grid">
+        <!-- Voice A — PP Neue Montreal -->
+        <div class="type-card">
+          <span class="type-card-label">Voice A — Confident</span>
+          <div class="type-card-name">PP Neue Montreal</div>
+          <div class="type-card-meta">Pangram Pangram · Headlines, wordmark, navigation, body</div>
+          <div class="type-specimen">
+            <span class="type-specimen-large" style="font-family:var(--montreal);font-weight:700;">Aa</span>
+            <span class="type-specimen-small" style="font-family:var(--montreal);font-weight:400;">Aa</span>
+          </div>
+          <div class="type-weights">
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--montreal);font-weight:100;">The vine grows in silence</span>
+              <span class="type-weight-label">Thin 100</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--montreal);font-weight:400;">The vine grows in silence</span>
+              <span class="type-weight-label">Book 400</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--montreal);font-weight:500;">The vine grows in silence</span>
+              <span class="type-weight-label">Medium 500</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--montreal);font-weight:600;font-style:italic;">The vine grows in silence</span>
+              <span class="type-weight-label">SemiBold Italic 600</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--montreal);font-weight:700;">The vine grows in silence</span>
+              <span class="type-weight-label">Bold 700</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Voice B — ZT Bros Oskon 90s -->
+        <div class="type-card">
+          <span class="type-card-label">Voice B — Quiet</span>
+          <div class="type-card-name">ZT Bros Oskon 90s</div>
+          <div class="type-card-meta">Zelow Type · Taglines, editorial body, pull quotes, the italic half</div>
+          <div class="type-specimen">
+            <span class="type-specimen-large" style="font-family:var(--serif);font-weight:400;font-style:italic;">Aa</span>
+            <span class="type-specimen-small" style="font-family:var(--serif);font-weight:200;">Aa</span>
+          </div>
+          <div class="type-weights">
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--serif);font-weight:200;">Refined beauty, cultivated</span>
+              <span class="type-weight-label">Extra Light 200</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--serif);font-weight:200;font-style:italic;">Refined beauty, cultivated</span>
+              <span class="type-weight-label">Extra Light Italic 200</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--serif);font-weight:300;">Refined beauty, cultivated</span>
+              <span class="type-weight-label">Light 300</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--serif);font-weight:300;font-style:italic;">Refined beauty, cultivated</span>
+              <span class="type-weight-label">Light Italic 300</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--serif);font-weight:400;">Refined beauty, cultivated</span>
+              <span class="type-weight-label">Regular 400</span>
+            </div>
+            <div class="type-weight-row">
+              <span class="type-weight-sample" style="font-family:var(--serif);font-weight:400;font-style:italic;">Refined beauty, cultivated</span>
+              <span class="type-weight-label">Italic 400</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dual heading specimens -->
+      <span class="ds-sub-label" style="margin-top:36px;">Slash-Pair Signature</span>
+      <div class="type-dual-demo">
+        <div class="dual-demo-item">
+          <span class="dual-bold">NERUMI</span>
+          <span class="dual-italic">/ intelligent flow</span>
+        </div>
+        <div class="dual-demo-item">
+          <span class="dual-bold">AUTOMATE</span>
+          <span class="dual-italic">/ beautifully</span>
+        </div>
+        <div class="dual-demo-item">
+          <span class="dual-bold">QUIET</span>
+          <span class="dual-italic">/ intelligence</span>
+        </div>
+        <div class="dual-demo-item">
+          <span class="dual-bold">BEGIN</span>
+          <span class="dual-italic">/ now</span>
+        </div>
+      </div>
+
+      <!-- Type scale specimen -->
+      <span class="ds-sub-label" style="margin-top:36px;">Serif Scale</span>
+      <div class="type-scale-strip">
+        <div class="type-scale-row">
+          <span class="type-scale-size">72px</span>
+          <span style="font-family:var(--serif);font-weight:200;font-size:72px;line-height:1;color:var(--fg);letter-spacing:-0.02em;">Elegant technology</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="type-scale-size">48px</span>
+          <span style="font-family:var(--serif);font-weight:300;font-size:48px;line-height:1.05;color:var(--fg);letter-spacing:-0.01em;">Inspired by organic growth</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="type-scale-size">32px</span>
+          <span style="font-family:var(--serif);font-weight:400;font-style:italic;font-size:32px;line-height:1.15;color:var(--fg-muted);">Built by hand, run by machine</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="type-scale-size">20px</span>
+          <span style="font-family:var(--serif);font-weight:400;font-size:20px;line-height:1.4;color:var(--fg-muted);">The vine grows as a system. Thick woody stems hold the weight. Trifoliate leaves do the work of taking in the world.</span>
+        </div>
+        <div class="type-scale-row">
+          <span class="type-scale-size">14px</span>
+          <span style="font-family:var(--serif);font-weight:300;font-size:14px;line-height:1.55;color:var(--fg-muted);">Cascading inflorescences are what the visitor sees. Fleshy seed pods carry the system into next season. Cut any one of these away and the vine is no longer a vine — it's a houseplant pretending.</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══ COLORS ═════════════════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Colors</h2>
+        <span class="ds-section-badge">3 Tiers · 17 Tokens</span>
+      </div>
+      <p class="ds-section-sub">Canvas dominates. Ink does the work. Botanical colors earn their place.</p>
+
+      <!-- Tier 1 -->
+      <div class="color-tier">
+        <div class="color-tier-label">Tier 1 — Primary Surfaces</div>
+        <div class="color-row">
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#F5F0E8;"></div>
+            <div class="color-info">
+              <span class="color-name">Canvas</span>
+              <span class="color-hex">#F5F0E8</span>
+              <span class="color-token">--bg</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#FAF6F0;"></div>
+            <div class="color-info">
+              <span class="color-name">Paper</span>
+              <span class="color-hex">#FAF6F0</span>
+              <span class="color-token">--bg-raised</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#0D0D0D;"></div>
+            <div class="color-info">
+              <span class="color-name">Ink</span>
+              <span class="color-hex">#0D0D0D</span>
+              <span class="color-token">--fg</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#2A2724;"></div>
+            <div class="color-info">
+              <span class="color-name">Ink Soft</span>
+              <span class="color-hex">#2A2724</span>
+              <span class="color-token">--fg-soft</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#6B645B;"></div>
+            <div class="color-info">
+              <span class="color-name">Ink Muted</span>
+              <span class="color-hex">#6B645B</span>
+              <span class="color-token">--fg-muted</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#9A9288;"></div>
+            <div class="color-info">
+              <span class="color-name">Ink Faint</span>
+              <span class="color-hex">#9A9288</span>
+              <span class="color-token">--fg-faint</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#C9C0B2;"></div>
+            <div class="color-info">
+              <span class="color-name">Ink Ghost</span>
+              <span class="color-hex">#C9C0B2</span>
+              <span class="color-token">--fg-ghost</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#DDD8CE;"></div>
+            <div class="color-info">
+              <span class="color-name">Stone</span>
+              <span class="color-hex">#DDD8CE</span>
+              <span class="color-token">--stone</span>
+            </div>
+          </div>
+        </div>
+        <div class="color-ramp">
+          <div class="color-ramp-step light-text" style="background:#0D0D0D;" data-label="Ink"></div>
+          <div class="color-ramp-step light-text" style="background:#2A2724;" data-label="Soft"></div>
+          <div class="color-ramp-step light-text" style="background:#6B645B;" data-label="Muted"></div>
+          <div class="color-ramp-step dark-text"  style="background:#9A9288;" data-label="Faint"></div>
+          <div class="color-ramp-step dark-text"  style="background:#C9C0B2;" data-label="Ghost"></div>
+          <div class="color-ramp-step dark-text"  style="background:#DDD8CE;" data-label="Stone"></div>
+          <div class="color-ramp-step dark-text"  style="background:#F5F0E8;" data-label="Canvas"></div>
+          <div class="color-ramp-step dark-text"  style="background:#FAF6F0;" data-label="Paper"></div>
+        </div>
+      </div>
+
+      <!-- Tier 2 — Botanical -->
+      <div class="color-tier">
+        <div class="color-tier-label">Tier 2 — Botanical (Tayabak)</div>
+        <div class="color-row">
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#3D6E5C;"></div>
+            <div class="color-info">
+              <span class="color-name">Jade Deep</span>
+              <span class="color-hex">#3D6E5C</span>
+              <span class="color-token">--jade-deep</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#6B9E8A;"></div>
+            <div class="color-info">
+              <span class="color-name">Jade</span>
+              <span class="color-hex">#6B9E8A</span>
+              <span class="color-token">--jade</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#A8C8BC;"></div>
+            <div class="color-info">
+              <span class="color-name">Jade Soft</span>
+              <span class="color-hex">#A8C8BC</span>
+              <span class="color-token">--jade-soft</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#D8EBE3;"></div>
+            <div class="color-info">
+              <span class="color-name">Jade Ghost</span>
+              <span class="color-hex">#D8EBE3</span>
+              <span class="color-token">--jade-ghost</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#8E5A36;"></div>
+            <div class="color-info">
+              <span class="color-name">Clay Deep</span>
+              <span class="color-hex">#8E5A36</span>
+              <span class="color-token">--clay-deep</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#B87A52;"></div>
+            <div class="color-info">
+              <span class="color-name">Clay</span>
+              <span class="color-hex">#B87A52</span>
+              <span class="color-token">--clay</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#DEB899;"></div>
+            <div class="color-info">
+              <span class="color-name">Clay Soft</span>
+              <span class="color-hex">#DEB899</span>
+              <span class="color-token">--clay-soft</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#F0DFD0;"></div>
+            <div class="color-info">
+              <span class="color-name">Clay Ghost</span>
+              <span class="color-hex">#F0DFD0</span>
+              <span class="color-token">--clay-ghost</span>
+            </div>
+          </div>
+        </div>
+        <div class="color-ramp">
+          <div class="color-ramp-step light-text" style="background:#3D6E5C;" data-label="Deep"></div>
+          <div class="color-ramp-step light-text" style="background:#6B9E8A;" data-label="Jade"></div>
+          <div class="color-ramp-step dark-text"  style="background:#A8C8BC;" data-label="Soft"></div>
+          <div class="color-ramp-step dark-text"  style="background:#D8EBE3;" data-label="Ghost"></div>
+          <div class="color-ramp-step dark-text"  style="background:#F5F0E8;" data-label="·"></div>
+          <div class="color-ramp-step dark-text"  style="background:#F0DFD0;" data-label="Ghost"></div>
+          <div class="color-ramp-step dark-text"  style="background:#DEB899;" data-label="Soft"></div>
+          <div class="color-ramp-step light-text" style="background:#B87A52;" data-label="Clay"></div>
+          <div class="color-ramp-step light-text" style="background:#8E5A36;" data-label="Deep"></div>
+        </div>
+      </div>
+
+      <!-- Tier 3 — Crimson -->
+      <div class="color-tier">
+        <div class="color-tier-label">Tier 3 — Crimson Accent</div>
+        <div class="color-row">
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#6E1414;"></div>
+            <div class="color-info">
+              <span class="color-name">Accent Deep</span>
+              <span class="color-hex">#6E1414</span>
+              <span class="color-token">--accent-deep</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#8B1A1A;"></div>
+            <div class="color-info">
+              <span class="color-name">Crimson</span>
+              <span class="color-hex">#8B1A1A</span>
+              <span class="color-token">--accent</span>
+            </div>
+          </div>
+          <div class="color-chip">
+            <div class="color-swatch" style="background:#B23A2E;"></div>
+            <div class="color-info">
+              <span class="color-name">Accent Soft</span>
+              <span class="color-hex">#B23A2E</span>
+              <span class="color-token">--accent-soft</span>
+            </div>
+          </div>
+        </div>
+        <div class="color-ramp" style="max-width:450px;">
+          <div class="color-ramp-step light-text" style="background:#6E1414;" data-label="Deep"></div>
+          <div class="color-ramp-step light-text" style="background:#8B1A1A;" data-label="Crimson"></div>
+          <div class="color-ramp-step light-text" style="background:#B23A2E;" data-label="Soft"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══ BUTTONS ═════════════════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Buttons</h2>
+        <span class="ds-section-badge">5 Sizes · 8 Styles · Rounded Rectangle</span>
+      </div>
+      <p class="ds-section-sub">Every button earns its place. Rounded rectangles throughout — no pills. Ink is the default. Jade for primary actions.</p>
+
+      <span class="ds-sub-label">Light surface</span>
+      <div class="btn-matrix">
+        <div class="btn-col">
+          <span class="btn-col-title">Ink (Default)</span>
+          <button class="btn btn-ink btn-xl">← Button →</button>
+          <button class="btn btn-ink btn-lg">← Button →</button>
+          <button class="btn btn-ink btn-md">← Button →</button>
+          <button class="btn btn-ink btn-sm">← Button →</button>
+          <button class="btn btn-ink btn-xs">← Button →</button>
+          <button class="btn btn-ink btn-md" disabled>← Button →</button>
+        </div>
+        <div class="btn-col">
+          <span class="btn-col-title">Outline</span>
+          <button class="btn btn-outline btn-xl">← Button →</button>
+          <button class="btn btn-outline btn-lg">← Button →</button>
+          <button class="btn btn-outline btn-md">← Button →</button>
+          <button class="btn btn-outline btn-sm">← Button →</button>
+          <button class="btn btn-outline btn-xs">← Button →</button>
+          <button class="btn btn-outline btn-md" disabled>← Button →</button>
+        </div>
+        <div class="btn-col">
+          <span class="btn-col-title">Jade (Primary)</span>
+          <button class="btn btn-jade btn-xl">← Button →</button>
+          <button class="btn btn-jade btn-lg">← Button →</button>
+          <button class="btn btn-jade btn-md">← Button →</button>
+          <button class="btn btn-jade btn-sm">← Button →</button>
+          <button class="btn btn-jade btn-xs">← Button →</button>
+          <button class="btn btn-jade btn-md" disabled>← Button →</button>
+        </div>
+        <div class="btn-col">
+          <span class="btn-col-title">Jade Outline</span>
+          <button class="btn btn-jade-outline btn-xl">← Button →</button>
+          <button class="btn btn-jade-outline btn-lg">← Button →</button>
+          <button class="btn btn-jade-outline btn-md">← Button →</button>
+          <button class="btn btn-jade-outline btn-sm">← Button →</button>
+          <button class="btn btn-jade-outline btn-xs">← Button →</button>
+          <button class="btn btn-jade-outline btn-md" disabled>← Button →</button>
+        </div>
+      </div>
+
+      <div class="btn-matrix">
+        <div class="btn-col">
+          <span class="btn-col-title">Clay</span>
+          <button class="btn btn-clay btn-xl">← Button →</button>
+          <button class="btn btn-clay btn-lg">← Button →</button>
+          <button class="btn btn-clay btn-md">← Button →</button>
+          <button class="btn btn-clay btn-sm">← Button →</button>
+          <button class="btn btn-clay btn-xs">← Button →</button>
+          <button class="btn btn-clay btn-md" disabled>← Button →</button>
+        </div>
+        <div class="btn-col">
+          <span class="btn-col-title">Clay Outline</span>
+          <button class="btn btn-clay-outline btn-xl">← Button →</button>
+          <button class="btn btn-clay-outline btn-lg">← Button →</button>
+          <button class="btn btn-clay-outline btn-md">← Button →</button>
+          <button class="btn btn-clay-outline btn-sm">← Button →</button>
+          <button class="btn btn-clay-outline btn-xs">← Button →</button>
+          <button class="btn btn-clay-outline btn-md" disabled>← Button →</button>
+        </div>
+        <div class="btn-col">
+          <span class="btn-col-title">Crimson</span>
+          <button class="btn btn-crimson btn-xl">← Button →</button>
+          <button class="btn btn-crimson btn-lg">← Button →</button>
+          <button class="btn btn-crimson btn-md">← Button →</button>
+          <button class="btn btn-crimson btn-sm">← Button →</button>
+          <button class="btn btn-crimson btn-xs">← Button →</button>
+          <button class="btn btn-crimson btn-md" disabled>← Button →</button>
+        </div>
+        <div class="btn-col">
+          <span class="btn-col-title">Ghost</span>
+          <button class="btn btn-ghost btn-xl">← Button →</button>
+          <button class="btn btn-ghost btn-lg">← Button →</button>
+          <button class="btn btn-ghost btn-md">← Button →</button>
+          <button class="btn btn-ghost btn-sm">← Button →</button>
+          <button class="btn btn-ghost btn-xs">← Button →</button>
+          <button class="btn btn-ghost btn-md" disabled>← Button →</button>
+        </div>
+      </div>
+
+      <!-- Icon buttons -->
+      <span class="ds-sub-label">Icon Buttons</span>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:36px;">
+        <button class="btn btn-icon btn-ink btn-xl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="btn btn-icon btn-ink btn-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="btn btn-icon btn-ink btn-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="btn btn-icon btn-ink btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="btn btn-icon btn-ink btn-xs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <span style="width:24px;"></span>
+        <button class="btn btn-icon btn-outline btn-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <button class="btn btn-icon btn-jade btn-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <button class="btn btn-icon btn-clay btn-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <button class="btn btn-icon btn-crimson btn-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <button class="btn btn-icon btn-ghost btn-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+
+      <!-- Dark surface -->
+      <div class="dark-strip">
+        <span class="ds-sub-label">Dark Surface</span>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-jade btn-lg">← Primary →</button>
+          <button class="btn btn-clay btn-lg">← Secondary →</button>
+          <button class="btn btn-outline btn-lg">← Outline →</button>
+          <button class="btn btn-ghost btn-lg">← Ghost →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══ BADGES & CHIPS ═════════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Badges &amp; Chips</h2>
+        <span class="ds-section-badge">3 Sizes · 9 Styles · Rounded Rectangle</span>
+      </div>
+
+      <span class="ds-sub-label">Large</span>
+      <div class="badge-row">
+        <span class="badge badge-lg badge-ink">Ink</span>
+        <span class="badge badge-lg badge-outline">Outline</span>
+        <span class="badge badge-lg badge-stone">Stone</span>
+        <span class="badge badge-lg badge-jade">Jade</span>
+        <span class="badge badge-lg badge-jade-solid">Jade Solid</span>
+        <span class="badge badge-lg badge-clay">Clay</span>
+        <span class="badge badge-lg badge-clay-solid">Clay Solid</span>
+        <span class="badge badge-lg badge-crimson">Crimson</span>
+        <span class="badge badge-lg badge-crimson-solid">Crimson Solid</span>
+      </div>
+
+      <span class="ds-sub-label">Medium</span>
+      <div class="badge-row">
+        <span class="badge badge-md badge-ink">Ink</span>
+        <span class="badge badge-md badge-outline">Outline</span>
+        <span class="badge badge-md badge-stone">Stone</span>
+        <span class="badge badge-md badge-jade">Jade</span>
+        <span class="badge badge-md badge-jade-solid">Jade Solid</span>
+        <span class="badge badge-md badge-clay">Clay</span>
+        <span class="badge badge-md badge-clay-solid">Clay Solid</span>
+        <span class="badge badge-md badge-crimson">Crimson</span>
+        <span class="badge badge-md badge-crimson-solid">Crimson Solid</span>
+      </div>
+
+      <span class="ds-sub-label">Small</span>
+      <div class="badge-row">
+        <span class="badge badge-sm badge-ink">Ink</span>
+        <span class="badge badge-sm badge-outline">Outline</span>
+        <span class="badge badge-sm badge-stone">Stone</span>
+        <span class="badge badge-sm badge-jade">Jade</span>
+        <span class="badge badge-sm badge-jade-solid">Jade Solid</span>
+        <span class="badge badge-sm badge-clay">Clay</span>
+        <span class="badge badge-sm badge-clay-solid">Clay Solid</span>
+        <span class="badge badge-sm badge-crimson">Crimson</span>
+        <span class="badge badge-sm badge-crimson-solid">Crimson Solid</span>
+      </div>
+
+      <div class="dark-strip">
+        <span class="ds-sub-label">Dark Surface</span>
+        <div class="badge-row">
+          <span class="badge badge-md badge-jade-solid">Jade</span>
+          <span class="badge badge-md badge-clay-solid">Clay</span>
+          <span class="badge badge-md badge-crimson-solid">Crimson</span>
+          <span class="badge badge-md badge-outline">Outline</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══ FORM INPUTS ════════════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Inputs</h2>
+        <span class="ds-section-badge">3 States</span>
+      </div>
+
+      <div class="input-row">
+        <div class="input-demo">
+          <label class="input-label">Default</label>
+          <input class="input-field" type="text" placeholder="hello@nerumi.io">
+        </div>
+        <div class="input-demo">
+          <label class="input-label">Focused</label>
+          <input class="input-field" type="text" value="hello@nerumi.io" style="border-color:var(--jade);box-shadow:0 0 0 3px var(--jade-ghost);">
+        </div>
+        <div class="input-demo">
+          <label class="input-label">Error</label>
+          <input class="input-field input-error" type="text" value="not-an-email">
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══ TOGGLES ════════════════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Toggles</h2>
+      </div>
+      <div class="toggle-row">
+        <button class="toggle" onclick="this.classList.toggle('active')" aria-label="Toggle off"></button>
+        <button class="toggle active" onclick="this.classList.toggle('active')" aria-label="Toggle on"></button>
+      </div>
+    </section>
+
+
+    <!-- ══ BORDER RADIUS ══════════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Radius</h2>
+        <span class="ds-section-badge">4 Tokens · No Pills</span>
+      </div>
+      <p class="ds-section-sub">v4 removes --radius-full (999px). Every interactive element is a rounded rectangle.</p>
+
+      <div class="radius-row">
+        <div class="radius-demo">
+          <div class="radius-box" style="border-radius:3px;"></div>
+          <span class="radius-label">XS · 3px</span>
+        </div>
+        <div class="radius-demo">
+          <div class="radius-box" style="border-radius:6px;"></div>
+          <span class="radius-label">SM · 6px</span>
+        </div>
+        <div class="radius-demo">
+          <div class="radius-box" style="border-radius:10px;"></div>
+          <span class="radius-label">MD · 10px</span>
+        </div>
+        <div class="radius-demo">
+          <div class="radius-box" style="border-radius:14px;"></div>
+          <span class="radius-label">LG · 14px</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══ CSS TOKENS REFERENCE ════════════════════════════ -->
+    <section class="ds-section">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Tokens</h2>
+        <span class="ds-section-badge">Copy-Paste CSS</span>
+      </div>
+      <div style="background:var(--fg);border-radius:var(--radius-lg);padding:28px 32px;overflow-x:auto;">
+        <pre style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;line-height:1.7;color:var(--fg-faint);margin:0;"><span style="color:var(--jade-soft);">:root</span> {
+  <span style="color:var(--fg-ghost);">/* Primary surfaces */</span>
+  <span style="color:var(--clay-soft);">--bg</span>:        <span style="color:var(--bg);">#F5F0E8</span>;
+  <span style="color:var(--clay-soft);">--bg-raised</span>: <span style="color:var(--bg);">#FAF6F0</span>;
+  <span style="color:var(--clay-soft);">--fg</span>:        <span style="color:var(--bg);">#0D0D0D</span>;
+  <span style="color:var(--clay-soft);">--fg-soft</span>:   <span style="color:var(--bg);">#2A2724</span>;
+  <span style="color:var(--clay-soft);">--fg-muted</span>:  <span style="color:var(--bg);">#6B645B</span>;
+  <span style="color:var(--clay-soft);">--fg-faint</span>:  <span style="color:var(--bg);">#9A9288</span>;
+  <span style="color:var(--clay-soft);">--fg-ghost</span>:  <span style="color:var(--bg);">#C9C0B2</span>;
+  <span style="color:var(--clay-soft);">--stone</span>:     <span style="color:var(--bg);">#DDD8CE</span>;
+  <span style="color:var(--clay-soft);">--accent</span>:    <span style="color:var(--bg);">#8B1A1A</span>;
+
+  <span style="color:var(--fg-ghost);">/* Botanical — Tayabak */</span>
+  <span style="color:var(--clay-soft);">--jade</span>:      <span style="color:var(--jade-soft);">#6B9E8A</span>;
+  <span style="color:var(--clay-soft);">--jade-soft</span>: <span style="color:var(--jade-soft);">#A8C8BC</span>;
+  <span style="color:var(--clay-soft);">--jade-deep</span>: <span style="color:var(--jade-soft);">#3D6E5C</span>;
+  <span style="color:var(--clay-soft);">--jade-ghost</span>:<span style="color:var(--jade-soft);">#D8EBE3</span>;
+  <span style="color:var(--clay-soft);">--clay</span>:      <span style="color:var(--clay-soft);">#B87A52</span>;
+  <span style="color:var(--clay-soft);">--clay-soft</span>: <span style="color:var(--clay-soft);">#DEB899</span>;
+  <span style="color:var(--clay-soft);">--clay-deep</span>: <span style="color:var(--clay-soft);">#8E5A36</span>;
+  <span style="color:var(--clay-soft);">--clay-ghost</span>:<span style="color:var(--clay-soft);">#F0DFD0</span>;
+
+  <span style="color:var(--fg-ghost);">/* Font stacks */</span>
+  <span style="color:var(--clay-soft);">--montreal</span>:  <span style="color:var(--bg);">'PPNeueMontreal', sans-serif</span>;
+  <span style="color:var(--clay-soft);">--serif</span>:     <span style="color:var(--bg);">'ZTBrosOskon90s', Georgia, serif</span>;
+
+  <span style="color:var(--fg-ghost);">/* Radii — rounded rectangle only, no pills */</span>
+  <span style="color:var(--clay-soft);">--radius-xs</span>: <span style="color:var(--bg);">3px</span>;
+  <span style="color:var(--clay-soft);">--radius-sm</span>: <span style="color:var(--bg);">6px</span>;
+  <span style="color:var(--clay-soft);">--radius-md</span>: <span style="color:var(--bg);">10px</span>;
+  <span style="color:var(--clay-soft);">--radius-lg</span>: <span style="color:var(--bg);">14px</span>;
+}</pre>
+      </div>
+    </section>
+
+    <!-- ══ CHANGELOG ══════════════════════════════════════ -->
+    <section class="ds-section" style="margin-bottom:0;">
+      <div class="ds-section-header">
+        <h2 class="ds-section-title">Changelog</h2>
+        <span class="ds-section-badge">v3 → v4</span>
+      </div>
+      <div style="font-family:var(--montreal);font-size:13px;line-height:1.7;color:var(--fg-muted);max-width:680px;">
+        <p style="margin-bottom:16px;"><strong style="color:var(--fg);font-weight:700;">Serif font replaced.</strong> Apple Garamond and Meshed Display removed. ZT Bros Oskon 90s (Zelow Type) is now Voice B — a retro-modern serif with 90s editorial character, 6 weights from Extra Light to Regular with italics. The CSS variable is renamed from <code style="font-size:11px;background:var(--stone);padding:2px 6px;border-radius:3px;">--garamond</code> to <code style="font-size:11px;background:var(--stone);padding:2px 6px;border-radius:3px;">--serif</code>.</p>
+        <p style="margin-bottom:16px;"><strong style="color:var(--fg);font-weight:700;">Button shape.</strong> All buttons and badges changed from pill-shaped (<code style="font-size:11px;background:var(--stone);padding:2px 6px;border-radius:3px;">border-radius: 999px</code>) to rounded rectangles. The <code style="font-size:11px;background:var(--stone);padding:2px 6px;border-radius:3px;">--radius-full</code> token is removed entirely.</p>
+        <p style="margin-bottom:16px;"><strong style="color:var(--fg);font-weight:700;">Radius tokens refined.</strong> New <code style="font-size:11px;background:var(--stone);padding:2px 6px;border-radius:3px;">--radius-xs: 3px</code> added. SM adjusted from 4px to 6px. MD adjusted from 8px to 10px. LG stays at 14px. The scale now has more visible steps.</p>
+        <p style="margin-bottom:16px;"><strong style="color:var(--fg);font-weight:700;">Toggle shape.</strong> Toggle track and thumb switched from circular/pill to rounded rectangle to match the new shape language.</p>
+        <p><strong style="color:var(--fg);font-weight:700;">Serif scale specimen added.</strong> New type section showing ZT Bros Oskon 90s at display sizes (72px down to 14px) to demonstrate its editorial range.</p>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
