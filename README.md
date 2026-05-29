@@ -1,28 +1,40 @@
 # Branded Competitor Analysis & Market-Monitoring Workflow
 
-An agentic workflow that turns a business profile + a list of competitor URLs into
-a **fully brand-styled PDF competitive analysis**, plus a **living Google Sheet
-tracker** and a **weekly change-monitoring job** that flags when a competitor moves.
+[![CI](https://github.com/zenobioscastillo1-source/competitor-analysis-workflow/actions/workflows/ci.yml/badge.svg)](https://github.com/zenobioscastillo1-source/competitor-analysis-workflow/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
 
-Built on a **WAT architecture (Workflows · Agents · Tools)**: plain-language SOPs
-describe *what* to do, an agent orchestrates, and small deterministic Python tools
-do the execution. Probabilistic reasoning stays in the agent; repeatable work stays
-in tested scripts.
+Give it a business profile and a list of competitor URLs. Get back a **fully
+brand-styled PDF competitive analysis**, a **living Google Sheet tracker**, and a
+**weekly job that flags when a competitor changes their pricing or messaging**.
 
-👉 **[See a sample report → `docs/sample-report.pdf`](docs/sample-report.pdf)** — six
-competitors analyzed, brand-styled cover, per-competitor profiles, market themes, a
-SWOT, and prioritized recommendations.
+### Why it's built this way
 
-> The sample analyzes [Nerumi](https://nerumi.io) (an AI-integrations studio) against
-> six real competitors, and demonstrates the branded-output pipeline end to end.
+When an AI agent performs *every* step itself, errors compound: five chained steps
+at 90% accuracy each is only ~59% reliable end-to-end. So this project keeps the
+**probabilistic reasoning in the agent** and pushes every repeatable step into
+**small, deterministic, tested Python tools** — the **WAT architecture (Workflows ·
+Agents · Tools)**. Plain-language SOPs say *what* to do; the agent orchestrates and
+recovers from failures; the tools do the execution the same way every time. The
+payoff is an automation you can actually trust to run unattended.
 
----
+## Sample output
+
+A report generated for [Nerumi](https://nerumi.io) (an AI-integrations studio) against
+six real competitors — brand-styled cover, per-competitor profiles, market themes, a
+SWOT, and prioritized recommendations. **[Full PDF →](docs/sample-report.pdf)**
+
+<p align="center">
+  <img src="docs/images/cover.png" alt="Branded report cover" width="440"><br><br>
+  <img src="docs/images/competitors.png" alt="Per-competitor profiles" width="380">
+  <img src="docs/images/swot.png" alt="Market themes and SWOT" width="380">
+</p>
 
 ## What it produces
 
 | Deliverable | Description |
 |-------------|-------------|
-| **Branded PDF** | A multi-section report rendered from an HTML/CSS template via headless Chromium, with brand colors, logo, and typography embedded. |
+| **Branded PDF** | Multi-section report rendered from an HTML/CSS template via headless Chromium, with brand colors, logo, and typography embedded — fully self-contained. |
 | **Google Sheet tracker** | One row per competitor (positioning, pricing, strengths, exposure) — the living record. |
 | **Weekly market watch** | Re-scrapes the watchlist, diffs against stored baselines, and logs only *meaningful* changes (pricing/number shifts, title changes, substantial copy changes) to a `Changes` tab. |
 
@@ -33,7 +45,7 @@ Inputs                          Tools (deterministic Python)          Output
 ──────────────────────────────────────────────────────────────────────────────
 business profile  ┐
 competitor URLs   ├─► scrape_single_site.py ─► clean text + links
-brand kit         ┘            │
+brand kit         ┘            │   (Firecrawl fallback for blocked sites)
                      summarize.py (Gemini) ─► per-competitor summary
                                    │
                   analyze_competitors.py (Gemini) ─► structured analysis.json
@@ -68,8 +80,7 @@ playwright install chromium                          # for PDF rendering
 cp .env.example .env                                 # then add your GEMINI_API_KEY
 ```
 
-Then run the pipeline (see [`workflows/branded_competitor_report.md`](workflows/branded_competitor_report.md)
-for the full SOP):
+Then run the pipeline (full SOP in [`workflows/branded_competitor_report.md`](workflows/branded_competitor_report.md)):
 
 ```bash
 # 1. scrape each competitor   2. summarize   3. assemble .tmp/competitors.json
@@ -83,18 +94,28 @@ python tools/render_pdf_report.py --analysis .tmp/analysis.json \
     --output reports/report.pdf
 ```
 
+## Development
+
+```bash
+pip install -r requirements-dev.txt
+ruff check .     # lint
+pytest -q        # unit tests for the deterministic logic (change detection, JSON, rendering)
+```
+
+CI runs lint + tests on every push and pull request (see the badge above).
+
 ## Tech
 
 Python · Google Gemini (`google-genai`) · Playwright/Chromium · Jinja2 ·
-BeautifulSoup · Google Sheets API · Slack SDK.
+BeautifulSoup · Google Sheets API · Slack SDK · Firecrawl (optional).
 
 ## Notes
 
-- **Brand kit** is data-driven: `brand/brand_kit.json` defines colors, fonts, and the
+- **Brand kit is data-driven:** `brand/brand_kit.json` defines colors, fonts, and the
   logo; the renderer base64-embeds fonts + logo so the PDF is fully self-contained.
-- **Resilience**: the Gemini tools retry transient errors and fall back across models.
-- **Configuration**: API keys and OAuth live in `.env` / local credential files
-  (gitignored) — see `.env.example`.
+- **Resilient by design:** the Gemini tools retry transient errors and fall back across
+  models; scraping escalates requests → Playwright → Firecrawl.
+- **Secrets** live in `.env` / local credential files (gitignored) — see `.env.example`.
 
 Fonts in `brand-assets/fonts/` are redistributed under their respective licenses
 (General Sans — Indian Type Foundry Free Font License; Lora — SIL Open Font License).

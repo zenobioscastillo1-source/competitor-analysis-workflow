@@ -1,0 +1,103 @@
+"""Unit tests for the deterministic logic in the WAT tools.
+
+These cover the pure functions — change detection, inline-markdown rendering,
+and JSON extraction — that the workflow's reliability depends on. No network or
+API calls are made.
+"""
+import analyze_competitors as analyze
+import monitor_competitors as mon
+import pytest
+import render_pdf_report as render
+
+
+class TestSlugify:
+    def test_strips_scheme_and_lowercases(self):
+        assert mon.slugify("https://www.Example.com/Pricing") == "www-example-com-pricing"
+
+    def test_short_host(self):
+        assert mon.slugify("http://x.io") == "x-io"
+
+
+class TestPriceTokens:
+    def test_extracts_currency_and_percent(self):
+        toks = mon.price_tokens("Plans from $20/mo, save 30% vs $200/yr")
+        assert "$20" in toks
+        assert "$200" in toks
+        assert "30%" in toks
+
+    def test_none_safe(self):
+        assert mon.price_tokens("") == []
+
+
+class TestDiffAgainstBaseline:
+    def _snap(self, title, text):
+        return {"title": title, "text": text, "prices": mon.price_tokens(text)}
+
+    def test_identical_is_no_change(self):
+        snap = self._snap("Pricing", "Plans start at $20 per month.")
+        assert mon.diff_against_baseline(snap, dict(snap)) == []
+
+    def test_price_change_detected(self):
+        old = self._snap("Pricing", "Plans start at $20 per month.")
+        new = self._snap("Pricing", "Plans start at $29 per month.")
+        assert any("Pricing" in c for c in mon.diff_against_baseline(old, new))
+
+    def test_title_change_detected(self):
+        old = self._snap("Old title", "the body is the same here")
+        new = self._snap("New title", "the body is the same here")
+        assert any("Title" in c for c in mon.diff_against_baseline(old, new))
+
+    def test_major_body_change_detected(self):
+        old = self._snap("T", "alpha beta gamma delta " * 20)
+        new = self._snap("T", "completely different wording throughout " * 20)
+        assert any("Body content" in c for c in mon.diff_against_baseline(old, new))
+
+    def test_trivial_whitespace_is_ignored(self):
+        old = self._snap("T", "one two three four five")
+        new = self._snap("T", "one   two  three   four five")
+        assert mon.diff_against_baseline(old, new) == []
+
+
+class TestMdInline:
+    def test_bold_to_strong(self):
+        assert str(render.md_inline("**hi**")) == "<strong>hi</strong>"
+
+    def test_html_is_escaped(self):
+        out = str(render.md_inline("a < b & c"))
+        assert "&lt;" in out and "&amp;" in out
+
+    def test_plain_passes_through(self):
+        assert str(render.md_inline("plain text")) == "plain text"
+
+    def test_none_safe(self):
+        assert str(render.md_inline(None)) == ""
+
+
+class TestExtractJson:
+    def test_plain_object(self):
+        assert analyze.extract_json('{"a": 1}') == {"a": 1}
+
+    def test_strips_code_fences(self):
+        assert analyze.extract_json('```json\n{"a": 1}\n```') == {"a": 1}
+
+    def test_ignores_surrounding_prose(self):
+        assert analyze.extract_json("Here you go:\n{\"a\": 1}\nThanks!") == {"a": 1}
+
+    def test_raises_without_json(self):
+        with pytest.raises(ValueError):
+            analyze.extract_json("there is no json here")
+
+
+class TestBuildCssVars:
+    def test_emits_color_radius_and_font_vars(self):
+        brand = {
+            "colors": {"ink": "#0D0D0D", "jade_deep": "#3D6E5C"},
+            "radius": {"sm": "6px"},
+            "fonts": {"sans": {"stack": "GS"}, "serif": {"stack": "Lora"}},
+        }
+        css = render.build_css_vars(brand)
+        assert "--ink: #0D0D0D;" in css
+        assert "--jade-deep: #3D6E5C;" in css
+        assert "--radius-sm: 6px;" in css
+        assert "--font-sans: GS;" in css
+        assert "--font-serif: Lora;" in css

@@ -16,10 +16,9 @@ import sys
 import time
 from pathlib import Path
 
+from config import get_env
 from google import genai
 from google.genai import errors as genai_errors
-
-from config import get_env
 
 DEFAULT_MODEL = "gemini-2.5-flash"
 # Tried in order if the configured model is rate-limited / overloaded.

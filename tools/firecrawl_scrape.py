@@ -20,7 +20,6 @@ import json
 import sys
 
 import requests
-
 from config import get_env, tmp_path
 
 DEFAULT_API_URL = "https://api.firecrawl.dev"

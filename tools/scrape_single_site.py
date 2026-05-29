@@ -16,7 +16,6 @@ import sys
 
 import requests
 from bs4 import BeautifulSoup
-
 from config import get_env, tmp_path
 
 DEFAULT_UA = (

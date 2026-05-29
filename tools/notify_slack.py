@@ -12,10 +12,9 @@ from __future__ import annotations
 import argparse
 import sys
 
+from config import get_env
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-
-from config import get_env
 
 
 def post_message(text: str, channel: str | None = None) -> None:

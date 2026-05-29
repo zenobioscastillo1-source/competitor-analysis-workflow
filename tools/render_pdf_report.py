@@ -22,10 +22,9 @@ import re
 import sys
 from pathlib import Path
 
+from config import PROJECT_ROOT
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup, escape
-
-from config import PROJECT_ROOT
 
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 TEMPLATE_NAME = "report_template.html"

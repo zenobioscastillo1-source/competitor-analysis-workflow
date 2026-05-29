@@ -31,7 +31,6 @@ import sys
 from pathlib import Path
 
 import requests
-
 from config import PROJECT_ROOT
 from scrape_single_site import scrape
 
@@ -130,8 +129,8 @@ def ensure_sheet(service, spreadsheet_id: str, sheet: str, header: list[str]) ->
 
 def push_rows_to_sheet(spreadsheet_id: str, sheet: str, rows: list[list[str]]) -> None:
     # Imported lazily so the tool runs for scrape-only/seed use without Google deps configured.
-    from push_to_google_sheet import append_rows, get_credentials
     from googleapiclient.discovery import build
+    from push_to_google_sheet import append_rows, get_credentials
 
     service = build("sheets", "v4", credentials=get_credentials())
     ensure_sheet(service, spreadsheet_id, sheet, CHANGES_HEADER)

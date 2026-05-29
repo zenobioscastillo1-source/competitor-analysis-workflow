@@ -33,11 +33,10 @@ import sys
 import time
 from pathlib import Path
 
+from config import PROJECT_ROOT, get_env, tmp_path
 from google import genai
 from google.genai import errors as genai_errors
 from google.genai import types
-
-from config import PROJECT_ROOT, get_env, tmp_path
 
 DEFAULT_MODEL = "gemini-2.5-flash"
 # Tried in order if the configured model is rate-limited / overloaded. All three
