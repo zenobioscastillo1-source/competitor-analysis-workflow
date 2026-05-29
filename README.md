@@ -43,7 +43,7 @@ SWOT, and prioritized recommendations. **[Full PDF →](docs/sample-report.pdf)*
 ```
 Inputs                          Tools (deterministic Python)          Output
 ──────────────────────────────────────────────────────────────────────────────
-business profile  ┐
+business profile  ┐   (optional) discover_competitors.py ─► candidate URLs
 competitor URLs   ├─► scrape_single_site.py ─► clean text + links
 brand kit         ┘            │   (Firecrawl fallback for blocked sites)
                      summarize.py (Gemini) ─► per-competitor summary
@@ -62,6 +62,7 @@ Weekly:  monitor_competitors.py ─► diff vs baselines ─► Sheet "Changes" 
 
 | Tool | Purpose |
 |------|---------|
+| `tools/discover_competitors.py` | Optional front-end: find competitors from the business profile via Gemini + Google Search grounding |
 | `tools/scrape_single_site.py` | Fetch a URL → clean text + links |
 | `tools/firecrawl_scrape.py` | Optional escalation scraper (Firecrawl) for blocked / JS-heavy sites — same output shape |
 | `tools/summarize.py` | Per-competitor summary via Google Gemini (retry + model fallback) |

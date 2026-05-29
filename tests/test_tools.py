@@ -5,6 +5,7 @@ and JSON extraction — that the workflow's reliability depends on. No network o
 API calls are made.
 """
 import analyze_competitors as analyze
+import discover_competitors as discover
 import monitor_competitors as mon
 import pytest
 import render_pdf_report as render
@@ -86,6 +87,31 @@ class TestExtractJson:
     def test_raises_without_json(self):
         with pytest.raises(ValueError):
             analyze.extract_json("there is no json here")
+
+
+class TestDiscover:
+    def test_extract_array_plain(self):
+        assert discover.extract_json_array('[{"url": "https://a.com"}]') == [{"url": "https://a.com"}]
+
+    def test_extract_array_fenced_and_prose(self):
+        raw = 'Here are the competitors:\n```json\n[{"url": "https://a.com"}]\n```'
+        assert discover.extract_json_array(raw) == [{"url": "https://a.com"}]
+
+    def test_extract_array_raises_without_array(self):
+        with pytest.raises(ValueError):
+            discover.extract_json_array("no array here")
+
+    def test_normalize_dedupes_and_filters(self):
+        items = [
+            {"name": "A", "url": "https://a.com", "why": "x"},
+            {"name": "A dup", "url": "https://a.com", "why": "y"},  # duplicate URL
+            {"name": "No scheme", "url": "ftp://b.com"},            # non-http dropped
+            {"name": "", "url": "https://c.com"},                   # name falls back to url
+            "not a dict",                                            # ignored
+        ]
+        out = discover.normalize(items)
+        assert [c["url"] for c in out] == ["https://a.com", "https://c.com"]
+        assert out[1]["name"] == "https://c.com"
 
 
 class TestBuildCssVars:

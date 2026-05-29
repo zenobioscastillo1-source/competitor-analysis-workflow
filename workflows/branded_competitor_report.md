@@ -14,8 +14,8 @@ branded PDF + ongoing monitoring.
 ## Required Inputs
 - **Business profile** — `inputs/business_profile.md` (fill it in, or draft it from
   what the user tells you). Drives the "where we can improve" analysis.
-- **Competitor URLs** — provided by the user. Homepage / pricing / about pages work
-  best. The user supplies the list (no auto-discovery).
+- **Competitor URLs** — provided by the user, or auto-discovered from the profile
+  with `tools/discover_competitors.py` (step 0). Homepage / pricing / about pages work best.
 - **Brand kit** — `brand/brand_kit.json` (already configured for Nerumi: colors from
   the v4 design system, General Sans = Voice A, Lora = Voice B, mark = Nerumi_Logo.svg).
 - **Gemini API key** — `GEMINI_API_KEY` in `.env` (free tier; summarize + analyze).
@@ -25,6 +25,7 @@ branded PDF + ongoing monitoring.
 ## Tools
 | Step | Tool | Purpose |
 |------|------|---------|
+| 0 | `tools/discover_competitors.py` | *(optional)* discover competitors from the profile via Gemini + Google Search |
 | 1 | `tools/scrape_single_site.py` | Fetch each competitor URL → clean text + links |
 | 1b | `tools/firecrawl_scrape.py` | *(optional)* escalation scraper for blocked / JS-heavy sites — same output shape |
 | 2 | `tools/summarize.py` | Per-competitor bullet summary via Gemini |
@@ -35,6 +36,10 @@ branded PDF + ongoing monitoring.
 | 7 | `tools/notify_slack.py` | (Optional) completion / change notifications |
 
 ## Procedure — One-time report
+0. **(Optional) Discover competitors** instead of supplying URLs by hand:
+   `python tools/discover_competitors.py --profile inputs/business_profile.md --count 8`
+   Review the printed candidates (also written to `.tmp/discovered.json`) and keep the
+   ones worth researching; their URLs feed step 2.
 1. **Confirm inputs.** Ensure `inputs/business_profile.md` is filled and gather the
    competitor URL list.
 2. **Scrape each URL** into `.tmp/`:
