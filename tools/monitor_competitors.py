@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import difflib
+import hashlib
 import json
 import re
 import sys
@@ -35,6 +36,7 @@ from config import PROJECT_ROOT
 from scrape_single_site import scrape
 
 STATE_DIR = PROJECT_ROOT / "monitor" / "state"
+HISTORY_DIR = PROJECT_ROOT / "monitor" / "history"
 PRICE_RE = re.compile(r"(?:[$£€]\s?\d[\d,]*(?:\.\d+)?|\b\d+(?:\.\d+)?\s?%)")
 # Below this body-text similarity (0-1), a change is considered meaningful.
 SIMILARITY_THRESHOLD = 0.97
@@ -104,6 +106,36 @@ def snapshot_of(name: str, scraped: dict) -> dict:
         "prices": price_tokens(scraped.get("text", "")),
         "fetched_at": dt.datetime.now().isoformat(timespec="seconds"),
     }
+
+
+def history_entry(snap: dict, status: str, detail: str = "") -> dict:
+    """A compact, dated record for the append-only trend log.
+
+    Stores the human-meaningful trend dimensions (title, pricing) plus a body
+    length + hash so size/content shifts are measurable later — but NOT the full
+    body text, which lives in the rolling baseline (monitor/state/) and would
+    bloat the history.
+    """
+    body = normalize(snap.get("text", ""))
+    return {
+        "date": dt.date.today().isoformat(),
+        "name": snap.get("name", ""),
+        "url": snap.get("url", ""),
+        "title": snap.get("title", ""),
+        "prices": snap.get("prices", []),
+        "body_len": len(body),
+        "body_hash": hashlib.sha1(body.encode("utf-8")).hexdigest()[:12],
+        "status": status,  # "seed" | "changed" | "ok"
+        "detail": detail,
+    }
+
+
+def append_history(slug: str, entry: dict) -> None:
+    """Append one snapshot line to monitor/history/<slug>.jsonl (durable, append-only)."""
+    HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+    path = HISTORY_DIR / f"{slug}.jsonl"
+    with path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
 CHANGES_HEADER = ["Date", "Competitor", "URL", "Change detected"]
@@ -181,6 +213,7 @@ def main() -> int:
 
         if baseline is None:
             save_state(slug, new_snap)
+            append_history(slug, history_entry(new_snap, "seed"))
             print(f"SEEDED  {name}")
             seeded += 1
             continue
@@ -191,9 +224,11 @@ def main() -> int:
             print(f"CHANGED {name}: {detail}")
             change_rows.append([today, name, url, detail])
             save_state(slug, new_snap)  # advance baseline so the same change isn't re-reported
+            append_history(slug, history_entry(new_snap, "changed", detail))
         else:
             print(f"OK      {name}")
             unchanged += 1
+            append_history(slug, history_entry(new_snap, "ok"))
 
     print(f"\nSummary: {len(change_rows)} changed, {unchanged} unchanged, {seeded} seeded, {failed} failed.")
 

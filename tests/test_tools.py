@@ -5,6 +5,7 @@ and JSON extraction — that the workflow's reliability depends on. No network o
 API calls are made.
 """
 import analyze_competitors as analyze
+import build_trends as trends
 import discover_competitors as discover
 import monitor_competitors as mon
 import pytest
@@ -158,3 +159,97 @@ class TestBuildCssVars:
         assert "--radius-sm: 6px;" in css
         assert "--font-sans: GS;" in css
         assert "--font-serif: Lora;" in css
+
+
+class TestSummarizeCompetitor:
+    def _entry(self, date, status, title="T", prices=None, detail=""):
+        prices = [] if prices is None else prices
+        return {
+            "date": date, "name": "Acme", "url": "https://acme.com",
+            "title": title, "prices": prices, "body_len": 100,
+            "body_hash": "abc", "status": status, "detail": detail,
+        }
+
+    def test_stable_timeline(self):
+        entries = [
+            self._entry("2026-01-01", "seed", prices=["$49"]),
+            self._entry("2026-01-08", "ok", prices=["$49"]),
+        ]
+        s = trends.summarize_competitor(entries)
+        assert s["snapshots"] == 2
+        assert s["changes"] == 0
+        assert s["pricing_changed"] is False
+        assert s["title_changed"] is False
+        assert s["last_change"] is None
+
+    def test_pricing_and_title_change(self):
+        entries = [
+            self._entry("2026-01-01", "seed", title="Old", prices=["$49"]),
+            self._entry("2026-01-08", "ok", title="Old", prices=["$49"]),
+            self._entry("2026-01-15", "changed", title="New", prices=["$49", "$99"],
+                        detail="Pricing/numbers changed: added $99"),
+        ]
+        s = trends.summarize_competitor(entries)
+        assert s["changes"] == 1
+        assert s["change_dates"] == ["2026-01-15"]
+        assert s["pricing_changed"] is True
+        assert s["pricing_from"] == ["$49"]
+        assert s["pricing_to"] == ["$49", "$99"]
+        assert s["title_changed"] is True
+        assert s["last_change"][0] == "2026-01-15"
+
+    def test_title_whitespace_is_not_a_change(self):
+        entries = [
+            self._entry("2026-01-01", "seed", title="Hello   World"),
+            self._entry("2026-01-08", "ok", title="Hello World"),
+        ]
+        assert trends.summarize_competitor(entries)["title_changed"] is False
+
+
+class TestHistoryRows:
+    def test_flattens_and_sorts_by_date_then_name(self):
+        history = {
+            "b": [{"date": "2026-01-08", "name": "Beta", "url": "u", "prices": ["$1"],
+                   "body_len": 5, "status": "ok", "detail": ""}],
+            "a": [{"date": "2026-01-01", "name": "Alpha", "url": "u", "prices": [],
+                   "body_len": 9, "status": "seed", "detail": ""}],
+        }
+        rows = trends.history_rows(history)
+        assert rows[0][0] == "2026-01-01" and rows[0][1] == "Alpha"
+        assert rows[1][0] == "2026-01-08" and rows[1][1] == "Beta"
+        assert rows[0][4] == ""        # empty prices -> empty cell
+        assert rows[1][4] == "$1"      # prices joined
+
+
+class TestLoadHistory:
+    def test_reads_sorts_and_skips_corrupt_lines(self, tmp_path):
+        p = tmp_path / "acme-com.jsonl"
+        p.write_text(
+            '{"date": "2026-01-08", "name": "Acme", "status": "ok"}\n'
+            "this is not json\n"
+            '{"date": "2026-01-01", "name": "Acme", "status": "seed"}\n',
+            encoding="utf-8",
+        )
+        history = trends.load_history(tmp_path)
+        assert list(history) == ["acme-com"]
+        dates = [e["date"] for e in history["acme-com"]]
+        assert dates == ["2026-01-01", "2026-01-08"]  # sorted, corrupt line skipped
+
+    def test_missing_dir_is_empty(self, tmp_path):
+        assert trends.load_history(tmp_path / "nope") == {}
+
+
+class TestFormatSummary:
+    def test_empty_history_message(self):
+        assert "No history yet" in trends.format_summary([])
+
+    def test_includes_competitor_and_change_count(self):
+        entries = [
+            {"date": "2026-01-01", "name": "Acme", "url": "u", "title": "T",
+             "prices": ["$49"], "status": "seed", "detail": ""},
+            {"date": "2026-01-08", "name": "Acme", "url": "u", "title": "T",
+             "prices": ["$49", "$99"], "status": "changed", "detail": "added $99"},
+        ]
+        out = trends.format_summary([trends.summarize_competitor(entries)])
+        assert "Acme" in out
+        assert "changes: 1" in out

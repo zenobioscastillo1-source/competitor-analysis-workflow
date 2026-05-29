@@ -17,8 +17,9 @@ service-account*.json
 # Generated deliverables (regenerable; PDFs/HTML are large binaries)
 reports/
 
-# Monitoring baselines — durable local state, machine-specific snapshots
+# Monitoring baselines + history — durable local state, machine-specific snapshots
 monitor/state/
+monitor/history/
 
 # Logs
 *.log

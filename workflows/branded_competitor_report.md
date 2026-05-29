@@ -34,7 +34,8 @@ branded PDF + ongoing monitoring.
 | 4 | `tools/render_pdf_report.py` | `analysis.json` + brand kit → branded PDF |
 | 4a | `tools/capture_screenshots.py` | *(optional)* capture competitor homepage screenshots to embed in the PDF |
 | 5 | `tools/push_to_google_sheet.py` | Create / append the living tracker Sheet |
-| 6 | `tools/monitor_competitors.py` | Weekly re-scrape, diff vs baseline, alert on change |
+| 6 | `tools/monitor_competitors.py` | Weekly re-scrape, diff vs baseline, alert on change, record a dated history snapshot |
+| 6a | `tools/build_trends.py` | Summarize the history log into trends + (re)write the Sheet "History" tab |
 | 7 | `tools/notify_slack.py` | (Optional) completion / change notifications |
 
 ## Procedure — One-time report
@@ -84,19 +85,32 @@ branded PDF + ongoing monitoring.
 2. **Weekly run** — diff each page vs its baseline; record + alert only on meaningful
    change (title, pricing/number tokens, or a substantial body-text shift):
    `python tools/monitor_competitors.py --watchlist .tmp/competitors.json --spreadsheet-id <TRACKER_ID> --sheet "Changes" --slack`
-3. **Schedule it.** Monitoring depends on *local* state (`monitor/state/` baselines,
-   `token.json`, `.venv`), so a cloud cron can't run it — use a local OS scheduler.
-   On Windows, a scheduled task runs `monitor/run_weekly.cmd`. Baselines persist in
-   `monitor/state/` (durable — not `.tmp/`).
+3. **Build the trend view.** Every monitor run also appends a dated snapshot to
+   `monitor/history/<slug>.jsonl` (append-only, durable — title, pricing, body
+   size/hash, and whether it was a meaningful change). Turn that log into trends:
+   `python tools/build_trends.py --spreadsheet-id <TRACKER_ID> --sheet "History"`
+   - Prints a per-competitor summary (snapshots tracked, # of changes, pricing
+     evolution, title shifts, last change) and (re)writes the Sheet `History` tab
+     with the full timeline. Add `--output .tmp/trends.md` for a markdown digest.
+   - Read-only over local history — it never re-scrapes. Run it after the monitor.
+   - **Baseline vs history:** `monitor/state/` is the *single rolling baseline*
+     (overwritten on change — "did anything change since last week"); `monitor/history/`
+     is the *append-only timeline* ("how has this evolved"). The `Changes` tab is the
+     alert log; the `History` tab is the trend log.
+4. **Schedule it.** Monitoring depends on *local* state (`monitor/state/` baselines,
+   `monitor/history/` timeline, `token.json`, `.venv`), so a cloud cron can't run it —
+   use a local OS scheduler. On Windows, a scheduled task runs `monitor/run_weekly.cmd`
+   (monitor *then* `build_trends`). State persists in `monitor/` (durable — not `.tmp/`).
 
 ### Example deployment
 - **Watchlist:** `monitor/watchlist.json` — the competitor URLs to track (name + url).
 - **Tracker Sheet:** create once with `push_to_google_sheet.py --create`; note the
   printed spreadsheet id and set it in `monitor/run_weekly.cmd`. The `Competitors`
   tab holds the snapshot; the `Changes` tab is the change log the weekly watch
-  appends to (auto-created with a header on first change).
-- **Runner:** `monitor/run_weekly.cmd` runs the monitor against the Sheet and logs to
-  `monitor/monitor.log`. Double-click to run on demand.
+  appends to (auto-created with a header on first change); the `History` tab is the
+  full dated timeline `build_trends.py` (re)writes each run.
+- **Runner:** `monitor/run_weekly.cmd` runs the monitor then `build_trends` against the
+  Sheet and logs both to `monitor/monitor.log`. Double-click to run on demand.
 - **Schedule (Windows):** register a weekly Task Scheduler job pointing at the runner:
   `Register-ScheduledTask -TaskName "CompetitorWatch" -Trigger (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 9:07AM) -Action (New-ScheduledTaskAction -Execute "<repo>\monitor\run_weekly.cmd")`
   Monitoring depends on *local* state (`monitor/state/`, `token.json`, `.venv`), so it

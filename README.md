@@ -37,6 +37,7 @@ SWOT, and prioritized recommendations. **[Full PDF →](docs/sample-report.pdf)*
 | **Branded PDF** | Multi-section report rendered from an HTML/CSS template via headless Chromium, with brand colors, logo, and typography embedded — fully self-contained. |
 | **Google Sheet tracker** | One row per competitor (positioning, pricing, strengths, exposure) — the living record. |
 | **Weekly market watch** | Re-scrapes the watchlist, diffs against stored baselines, and logs only *meaningful* changes (pricing/number shifts, title changes, substantial copy changes) to a `Changes` tab. |
+| **Trend timeline** | Each run also records a dated snapshot to an append-only history log; `build_trends.py` turns it into a `History` tab + summary showing how each competitor's pricing/messaging has evolved over time. |
 
 ## Architecture
 
@@ -55,7 +56,9 @@ brand kit         ┘            │   (Firecrawl fallback for blocked sites)
                                                            │
                   push_to_google_sheet.py ◄────────────────┘  ─► Sheet tracker
 Weekly:  monitor_competitors.py ─► diff vs baselines ─► Sheet "Changes" tab
-                                                    (+ optional Slack alert)
+                                │                   (+ optional Slack alert)
+                                └─► append dated snapshot ─► monitor/history/*.jsonl
+                  build_trends.py ─► trend summary ─────► Sheet "History" tab
 ```
 
 ## Tools
@@ -71,7 +74,8 @@ Weekly:  monitor_competitors.py ─► diff vs baselines ─► Sheet "Changes" 
 | `tools/analyze_competitors.py` | Profile + summaries → structured JSON (SWOT, opportunities, recommendations) |
 | `tools/render_pdf_report.py` | Analysis + brand kit → self-contained branded PDF |
 | `tools/push_to_google_sheet.py` | Create / append the Google Sheet tracker |
-| `tools/monitor_competitors.py` | Re-scrape, diff vs baseline, log changes + optional Slack |
+| `tools/monitor_competitors.py` | Re-scrape, diff vs baseline, log changes + optional Slack, record a dated history snapshot |
+| `tools/build_trends.py` | Summarize the history log into trends + (re)write the Sheet `History` tab |
 | `tools/notify_slack.py` | Post a Slack message |
 
 ## Quick start
