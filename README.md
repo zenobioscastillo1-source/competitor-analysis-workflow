@@ -51,6 +51,7 @@ Weekly:  monitor_competitors.py ─► diff vs baselines ─► Sheet "Changes" 
 | Tool | Purpose |
 |------|---------|
 | `tools/scrape_single_site.py` | Fetch a URL → clean text + links |
+| `tools/firecrawl_scrape.py` | Optional escalation scraper (Firecrawl) for blocked / JS-heavy sites — same output shape |
 | `tools/summarize.py` | Per-competitor summary via Google Gemini (retry + model fallback) |
 | `tools/analyze_competitors.py` | Profile + summaries → structured JSON (SWOT, opportunities, recommendations) |
 | `tools/render_pdf_report.py` | Analysis + brand kit → self-contained branded PDF |

@@ -26,6 +26,7 @@ branded PDF + ongoing monitoring.
 | Step | Tool | Purpose |
 |------|------|---------|
 | 1 | `tools/scrape_single_site.py` | Fetch each competitor URL → clean text + links |
+| 1b | `tools/firecrawl_scrape.py` | *(optional)* escalation scraper for blocked / JS-heavy sites — same output shape |
 | 2 | `tools/summarize.py` | Per-competitor bullet summary via Gemini |
 | 3 | `tools/analyze_competitors.py` | Profile + summaries → structured `analysis.json` |
 | 4 | `tools/render_pdf_report.py` | `analysis.json` + brand kit → branded PDF |
@@ -41,6 +42,10 @@ branded PDF + ongoing monitoring.
    - Sparse text usually means a JS-rendered site. The render dependency (Playwright
      + Chromium) is already installed — escalate to a headless-browser fetch rather
      than silently skipping. Don't drop a competitor without noting it.
+   - Still blocked (Cloudflare/anti-bot, 403/429)? Escalate to Firecrawl:
+     `python tools/firecrawl_scrape.py <url> --output <slug>.json` (needs
+     `FIRECRAWL_API_KEY` in `.env`). Same output shape, so the rest of the pipeline
+     is unchanged.
 3. **Summarize each scrape:**
    `python tools/summarize.py --input .tmp/<slug>.json --output .tmp/<slug>.summary.txt`
 4. **Assemble `.tmp/competitors.json`** — a JSON list, one object per competitor:
@@ -94,8 +99,13 @@ branded PDF + ongoing monitoring.
 - Intermediate scrapes/summaries/`analysis.json` in `.tmp/` (disposable).
 
 ## Edge Cases & Notes
-- **JS-heavy sites:** requests + BeautifulSoup only see server-rendered HTML. Sparse
-  text is the tell; escalate to a Chromium fetch (Playwright is installed).
+- **JS-heavy / blocked sites:** requests + BeautifulSoup only see server-rendered
+  HTML. Sparse text or a 403/429 is the tell. First escalate to a Chromium fetch
+  (Playwright is installed); if a site is *still* blocked (Cloudflare/anti-bot), use
+  `tools/firecrawl_scrape.py` (hosted Firecrawl API; set `FIRECRAWL_API_KEY` in
+  `.env`). It returns the same JSON shape, so `summarize.py` consumes it unchanged.
+  Firecrawl is a paid API with a free tier — only reach for it when the free local
+  path fails.
 - **Gemini JSON:** `analyze_competitors.py` requests strict JSON and strips code
   fences; if a model response ever fails to parse, re-run (temperature is low) or
   shorten the per-competitor summaries (`MAX_SUMMARY_CHARS`).
