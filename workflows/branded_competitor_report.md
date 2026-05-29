@@ -27,10 +27,12 @@ branded PDF + ongoing monitoring.
 |------|------|---------|
 | 0 | `tools/discover_competitors.py` | *(optional)* discover competitors from the profile via Gemini + Google Search |
 | 1 | `tools/scrape_single_site.py` | Fetch each competitor URL → clean text + links |
+| 1a | `tools/scrape_site_pages.py` | *(optional)* deeper scrape: homepage + key sub-pages (pricing/about/…) into one doc |
 | 1b | `tools/firecrawl_scrape.py` | *(optional)* escalation scraper for blocked / JS-heavy sites — same output shape |
 | 2 | `tools/summarize.py` | Per-competitor bullet summary via Gemini |
 | 3 | `tools/analyze_competitors.py` | Profile + summaries → structured `analysis.json` |
 | 4 | `tools/render_pdf_report.py` | `analysis.json` + brand kit → branded PDF |
+| 4a | `tools/capture_screenshots.py` | *(optional)* capture competitor homepage screenshots to embed in the PDF |
 | 5 | `tools/push_to_google_sheet.py` | Create / append the living tracker Sheet |
 | 6 | `tools/monitor_competitors.py` | Weekly re-scrape, diff vs baseline, alert on change |
 | 7 | `tools/notify_slack.py` | (Optional) completion / change notifications |
@@ -51,6 +53,8 @@ branded PDF + ongoing monitoring.
      `python tools/firecrawl_scrape.py <url> --output <slug>.json` (needs
      `FIRECRAWL_API_KEY` in `.env`). Same output shape, so the rest of the pipeline
      is unchanged.
+   - For deeper input, `python tools/scrape_site_pages.py <url> --output <slug>.json`
+     pulls the homepage + key sub-pages (pricing/about/…) into one document.
 3. **Summarize each scrape:**
    `python tools/summarize.py --input .tmp/<slug>.json --output .tmp/<slug>.summary.txt`
 4. **Assemble `.tmp/competitors.json`** — a JSON list, one object per competitor:
@@ -64,6 +68,9 @@ branded PDF + ongoing monitoring.
    `python tools/render_pdf_report.py --analysis .tmp/analysis.json --output "reports/Nerumi_Competitive_Landscape_<date>.pdf"`
    - Fonts and the logo mark are base64-embedded, so the PDF is self-contained.
    - Add `--keep-html` to also write the rendered HTML for inspection/tweaks.
+   - To embed competitor homepage thumbnails, first capture them:
+     `python tools/capture_screenshots.py --competitors .tmp/competitors.json --output-dir .tmp/shots`,
+     then add `--shots-dir .tmp/shots` to the render command.
 7. **Create the tracker Sheet** (first time) and write one row per competitor:
    `python tools/push_to_google_sheet.py --create "Nerumi Competitor Tracker" --values-file .tmp/rows.json`
    - Suggested columns: `[date, competitor, url, positioning, pricing, whats_working, weaknesses]`

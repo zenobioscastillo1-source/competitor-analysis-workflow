@@ -9,6 +9,8 @@ import discover_competitors as discover
 import monitor_competitors as mon
 import pytest
 import render_pdf_report as render
+import scrape_site_pages as sp
+import util
 
 
 class TestSlugify:
@@ -112,6 +114,35 @@ class TestDiscover:
         out = discover.normalize(items)
         assert [c["url"] for c in out] == ["https://a.com", "https://c.com"]
         assert out[1]["name"] == "https://c.com"
+
+
+class TestUtilSlugify:
+    def test_slug(self):
+        assert util.slugify("https://www.Example.com/Page") == "www-example-com-page"
+
+    def test_empty_fallback(self):
+        assert util.slugify("https://") == "page"
+
+
+class TestSelectKeyPages:
+    def test_picks_key_same_domain_pages(self):
+        base = "https://acme.com/"
+        links = [
+            "/pricing", "/about-us", "https://acme.com/product",
+            "https://other.com/pricing", "/", "#top", "mailto:x@acme.com", "/blog/post-1",
+        ]
+        out = sp.select_key_pages(base, links, max_pages=5)
+        assert "https://acme.com/pricing" in out
+        assert "https://acme.com/about-us" in out
+        assert "https://acme.com/product" in out
+        assert all("other.com" not in u for u in out)   # external excluded
+        assert "https://acme.com/" not in out            # homepage excluded
+        assert all("/blog/" not in u for u in out)       # non-key path excluded
+
+    def test_respects_max_pages(self):
+        base = "https://acme.com/"
+        links = ["/pricing", "/about", "/features", "/solutions", "/services"]
+        assert len(sp.select_key_pages(base, links, max_pages=2)) == 2
 
 
 class TestBuildCssVars:

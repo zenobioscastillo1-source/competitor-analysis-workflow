@@ -25,6 +25,7 @@ from pathlib import Path
 from config import PROJECT_ROOT
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup, escape
+from util import slugify
 
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 TEMPLATE_NAME = "report_template.html"
@@ -80,6 +81,23 @@ def build_logo_svg(brand: dict) -> str:
     return svg
 
 
+def attach_screenshots(analysis: dict, shots_dir: str) -> int:
+    """Embed a homepage screenshot (base64 data URI) into each competitor that has
+    a matching <slug>.png in shots_dir. Returns how many were attached."""
+    directory = _resolve(shots_dir)
+    attached = 0
+    for competitor in analysis.get("competitors", []):
+        url = competitor.get("url", "")
+        if not url:
+            continue
+        shot = directory / f"{slugify(url)}.png"
+        if shot.exists():
+            b64 = base64.b64encode(shot.read_bytes()).decode("ascii")
+            competitor["screenshot"] = f"data:image/png;base64,{b64}"
+            attached += 1
+    return attached
+
+
 def md_inline(value) -> Markup:
     """Escape HTML, then render simple inline markdown the model sometimes emits
     (**bold**, *italic*) so it doesn't show up as literal asterisks in the PDF."""
@@ -127,11 +145,16 @@ def main() -> int:
     parser.add_argument("--analysis", required=True, help="Path to analysis JSON (analyze_competitors.py output).")
     parser.add_argument("--brand", default="brand/brand_kit.json", help="Path to brand kit JSON.")
     parser.add_argument("--output", required=True, help="Output PDF path (e.g. reports/report.pdf).")
+    parser.add_argument("--shots-dir", help="Dir of <slug>.png homepage screenshots to embed per competitor.")
     parser.add_argument("--keep-html", action="store_true", help="Also write the rendered HTML next to the PDF.")
     args = parser.parse_args()
 
     analysis = json.loads(_resolve(args.analysis).read_text(encoding="utf-8"))
     brand = json.loads(_resolve(args.brand).read_text(encoding="utf-8"))
+
+    if args.shots_dir:
+        n = attach_screenshots(analysis, args.shots_dir)
+        print(f"Embedded {n} competitor screenshot(s).")
 
     html = render_html(analysis, brand)
     output = _resolve(args.output)

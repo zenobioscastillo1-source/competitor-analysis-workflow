@@ -64,7 +64,9 @@ Weekly:  monitor_competitors.py ─► diff vs baselines ─► Sheet "Changes" 
 |------|---------|
 | `tools/discover_competitors.py` | Optional front-end: find competitors from the business profile via Gemini + Google Search grounding |
 | `tools/scrape_single_site.py` | Fetch a URL → clean text + links |
+| `tools/scrape_site_pages.py` | Optional deeper scrape: homepage + key sub-pages (pricing/about/…) into one document |
 | `tools/firecrawl_scrape.py` | Optional escalation scraper (Firecrawl) for blocked / JS-heavy sites — same output shape |
+| `tools/capture_screenshots.py` | Optional: capture competitor homepage screenshots to embed as thumbnails in the report |
 | `tools/summarize.py` | Per-competitor summary via Google Gemini (retry + model fallback) |
 | `tools/analyze_competitors.py` | Profile + summaries → structured JSON (SWOT, opportunities, recommendations) |
 | `tools/render_pdf_report.py` | Analysis + brand kit → self-contained branded PDF |
